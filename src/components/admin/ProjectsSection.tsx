@@ -1,6 +1,7 @@
 interface Project {
   id: number;
   title: string;
+  description: string;
   student: string;
   status: string;
   category: string;
@@ -8,15 +9,18 @@ interface Project {
   fundingGoal: string;
   currentFunding: string;
   investors: number;
+  technologies: string[];
+  visibility: boolean;
 }
 
 interface ProjectsSectionProps {
   projects: Project[];
   onProjectApproval: (projectId: number, approved: boolean) => void;
-  onProjectDelete: (projectId: number) => void;
+  onViewDetails: (projectId: number) => void;
+  onToggleVisibility: (projectId: number, visibility: boolean) => void;
 }
 
-export default function ProjectsSection({ projects, onProjectApproval, onProjectDelete }: ProjectsSectionProps) {
+export default function ProjectsSection({ projects, onProjectApproval, onViewDetails, onToggleVisibility }: ProjectsSectionProps) {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -46,6 +50,9 @@ export default function ProjectsSection({ projects, onProjectApproval, onProject
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Funding
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Visibility
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
@@ -84,20 +91,35 @@ export default function ProjectsSection({ projects, onProjectApproval, onProject
                     {project.investors} investors
                   </div>
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <button
+                    onClick={() => onToggleVisibility(project.id, !project.visibility)}
+                    className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      project.visibility
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {project.visibility ? 'Visible' : 'Hidden'}
+                  </button>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-2">
-                    <button className="text-indigo-600 hover:text-indigo-900">
+                    <button
+                      onClick={() => onViewDetails(project.id)}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
                       View
                     </button>
                     {project.status === 'Pending Review' && (
                       <>
-                        <button 
+                        <button
                           onClick={() => onProjectApproval(project.id, true)}
                           className="text-green-600 hover:text-green-900"
                         >
                           Approve
                         </button>
-                        <button 
+                        <button
                           onClick={() => onProjectApproval(project.id, false)}
                           className="text-red-600 hover:text-red-900"
                         >
@@ -105,12 +127,6 @@ export default function ProjectsSection({ projects, onProjectApproval, onProject
                         </button>
                       </>
                     )}
-                    <button
-                      onClick={() => onProjectDelete(project.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
                   </div>
                 </td>
               </tr>

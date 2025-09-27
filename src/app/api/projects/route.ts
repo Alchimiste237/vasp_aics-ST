@@ -13,15 +13,20 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const studentId = searchParams.get('studentId');
 
-  if (!studentId) {
-    return NextResponse.json({ message: 'Student ID is required' }, { status: 400 });
-  }
-
   try {
     const db = await connectToDatabase();
     const projectsCollection = db.collection('projects');
 
-    const projects = await projectsCollection.find({ studentId }).toArray();
+    let query = {};
+    if (studentId) {
+      // For student-specific view, show all their projects
+      query = { studentId };
+    } else {
+      // For public view, show only approved and visible projects
+      query = { status: 'Approved', visibility: true };
+    }
+
+    const projects = await projectsCollection.find(query).toArray();
     return NextResponse.json(projects, { status: 200 });
   } catch (error) {
     console.error('Fetch projects error:', error);

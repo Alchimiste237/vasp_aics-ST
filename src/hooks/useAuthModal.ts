@@ -11,13 +11,7 @@ export const useAuthModal = () => {
   const [activeTab, setActiveTab] = useState('student');
   const [isLogin, setIsLogin] = useState(false);
 
-  const [studentForm, setStudentForm] = useState({
-    studentId: '',
-    schoolName: '',
-    fieldOfStudy: '',
-    password: '',
-    confirmPassword: '',
-  });
+
 
   const [investorForm, setInvestorForm] = useState({
     name: '',
@@ -44,28 +38,7 @@ export const useAuthModal = () => {
     setShowModal(true);
   };
 
-  const handleStudentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userType: 'student', ...studentForm }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        toast.success(data.message);
-        login('student');
-        closeModal();
-        router.push('/student');
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.error('Registration error:', error);
-      toast.error('Registration failed');
-    }
-  };
+
 
   const handleInvestorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +75,7 @@ export const useAuthModal = () => {
       if (response.ok) {
         toast.success(data.message);
         const userType = data.userType || 'student';
-        login(userType);
+        login(userType, userType === 'admin' ? loginForm.studentId : loginForm.studentId);
         closeModal();
         router.push(userType === 'admin' ? '/admin' : '/student');
       } else {
@@ -126,7 +99,7 @@ export const useAuthModal = () => {
       if (response.ok) {
         toast.success(data.message);
         const userType = data.userType || 'investor';
-        login(userType);
+        login(userType, userType === 'admin' ? investorLoginForm.name : investorLoginForm.name);
         closeModal();
         router.push(userType === 'admin' ? '/admin' : '/investor');
       } else {
@@ -147,15 +120,12 @@ export const useAuthModal = () => {
     setActiveTab,
     isLogin,
     setIsLogin,
-    studentForm,
-    setStudentForm,
     investorForm,
     setInvestorForm,
     loginForm,
     setLoginForm,
     investorLoginForm,
     setInvestorLoginForm,
-    handleStudentSubmit,
     handleInvestorSubmit,
     handleStudentLogin,
     handleInvestorLogin,

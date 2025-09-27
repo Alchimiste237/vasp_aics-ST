@@ -1,5 +1,4 @@
 import React from 'react';
-import StudentRegistrationForm from './StudentRegistrationForm';
 import InvestorRegistrationForm from './InvestorRegistrationForm';
 import StudentLoginForm from './StudentLoginForm';
 import InvestorLoginForm from './InvestorLoginForm';
@@ -12,15 +11,12 @@ interface AuthModalProps {
   setActiveTab: (tab: string) => void;
   isLogin: boolean;
   setIsLogin: (login: boolean) => void;
-  studentForm: any;
-  setStudentForm: (form: any) => void;
   investorForm: any;
   setInvestorForm: (form: any) => void;
   loginForm: any;
   setLoginForm: (form: any) => void;
   investorLoginForm: any;
   setInvestorLoginForm: (form: any) => void;
-  handleStudentSubmit: (e: React.FormEvent) => void;
   handleInvestorSubmit: (e: React.FormEvent) => void;
   handleStudentLogin: (e: React.FormEvent) => void;
   handleInvestorLogin: (e: React.FormEvent) => void;
@@ -34,15 +30,12 @@ export default function AuthModal({
   setActiveTab,
   isLogin,
   setIsLogin,
-  studentForm,
-  setStudentForm,
   investorForm,
   setInvestorForm,
   loginForm,
   setLoginForm,
   investorLoginForm,
   setInvestorLoginForm,
-  handleStudentSubmit,
   handleInvestorSubmit,
   handleStudentLogin,
   handleInvestorLogin,
@@ -93,48 +86,42 @@ export default function AuthModal({
             </div>
           </div>
 
-          {/* Login/Register Toggle */}
-          <div className="flex justify-center mb-6">
-            <div className="flex bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setIsLogin(false)}
-                className={`px-4 py-2 rounded-md transition-colors ${
-                  !isLogin
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Register
-              </button>
-              <button
-                onClick={() => setIsLogin(true)}
-                className={`px-4 py-2 rounded-md transition-colors ${
-                  isLogin
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Login
-              </button>
+          {/* Login/Register Toggle - only for investor */}
+          {activeTab === 'investor' && (
+            <div className="flex justify-center mb-6">
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setIsLogin(false)}
+                  className={`px-4 py-2 rounded-md transition-colors ${
+                    !isLogin
+                      ? 'bg-white text-indigo-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Register
+                </button>
+                <button
+                  onClick={() => setIsLogin(true)}
+                  className={`px-4 py-2 rounded-md transition-colors ${
+                    isLogin
+                      ? 'bg-white text-indigo-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Login
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Student Forms */}
           {activeTab === 'student' && (
             <div>
-              {!isLogin ? (
-                <StudentRegistrationForm
-                  studentForm={studentForm}
-                  setStudentForm={setStudentForm}
-                  handleStudentSubmit={handleStudentSubmit}
-                />
-              ) : (
-                <StudentLoginForm
-                  loginForm={loginForm}
-                  setLoginForm={setLoginForm}
-                  handleStudentLogin={handleStudentLogin}
-                />
-              )}
+              <StudentLoginForm
+                loginForm={loginForm}
+                setLoginForm={setLoginForm}
+                handleStudentLogin={handleStudentLogin}
+              />
             </div>
           )}
 

@@ -7,7 +7,8 @@ type UserType = 'visitor' | 'student' | 'investor' | 'admin';
 interface AuthContextType {
   isLoggedIn: boolean;
   userType: UserType;
-  login: (type: UserType) => void;
+  userId: string;
+  login: (type: UserType, userId?: string) => void;
   logout: () => void;
 }
 
@@ -28,30 +29,37 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userType, setUserType] = useState<UserType>('visitor');
+  const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
     // Check localStorage for persisted auth state
     const storedUserType = localStorage.getItem('userType') as UserType;
+    const storedUserId = localStorage.getItem('userId') || '';
     if (storedUserType && storedUserType !== 'visitor') {
       setIsLoggedIn(true);
       setUserType(storedUserType);
+      setUserId(storedUserId);
     }
   }, []);
 
-  const login = (type: UserType) => {
+  const login = (type: UserType, userId?: string) => {
     setIsLoggedIn(true);
     setUserType(type);
+    setUserId(userId || '');
     localStorage.setItem('userType', type);
+    if (userId) localStorage.setItem('userId', userId);
   };
 
   const logout = () => {
     setIsLoggedIn(false);
     setUserType('visitor');
+    setUserId('');
     localStorage.removeItem('userType');
+    localStorage.removeItem('userId');
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userType, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, userType, userId, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -18,7 +18,40 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const usersCollection = db.collection('users');
 
   try {
-    if (action === 'register') {
+    if (action === 'changePassword') {
+      const { userType, userId, currentPassword, newPassword } = body;
+
+      if (!userType || !userId || !currentPassword || !newPassword) {
+        return NextResponse.json({ message: 'All fields are required' }, { status: 400 });
+      }
+
+      let query: any = { userType };
+
+      if (userType === 'student') {
+        query.studentId = userId;
+      } else if (userType === 'investor') {
+        query.name = userId;
+      } else if (userType === 'admin') {
+        query.username = userId;
+      } else {
+        return NextResponse.json({ message: 'Invalid user type' }, { status: 400 });
+      }
+
+      const user = await usersCollection.findOne(query);
+      if (!user) {
+        return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      }
+
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isCurrentPasswordValid) {
+        return NextResponse.json({ message: 'Current password is incorrect' }, { status: 401 });
+      }
+
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      await usersCollection.updateOne(query, { $set: { password: hashedNewPassword } });
+
+      return NextResponse.json({ message: 'Password updated successfully' }, { status: 200 });
+    } else if (action === 'register') {
       const { userType, ...formData } = body;
 
       if (!userType) {

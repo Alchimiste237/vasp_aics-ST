@@ -32,15 +32,12 @@ export default function LandingPage() {
         setActiveTab={modalState.setActiveTab}
         isLogin={modalState.isLogin}
         setIsLogin={modalState.setIsLogin}
-        studentForm={modalState.studentForm}
-        setStudentForm={modalState.setStudentForm}
         investorForm={modalState.investorForm}
         setInvestorForm={modalState.setInvestorForm}
         loginForm={modalState.loginForm}
         setLoginForm={modalState.setLoginForm}
         investorLoginForm={modalState.investorLoginForm}
         setInvestorLoginForm={modalState.setInvestorLoginForm}
-        handleStudentSubmit={modalState.handleStudentSubmit}
         handleInvestorSubmit={modalState.handleInvestorSubmit}
         handleStudentLogin={modalState.handleStudentLogin}
         handleInvestorLogin={modalState.handleInvestorLogin}

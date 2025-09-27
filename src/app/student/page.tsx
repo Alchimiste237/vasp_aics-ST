@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../../components/Navigation';
 import Sidebar from '../../components/student/Sidebar';
 import OverviewSection from '../../components/student/OverviewSection';
@@ -32,21 +33,23 @@ interface Project {
 }
 
 export default function StudentDashboard() {
+  const { userId } = useAuth();
+
   // State management for different sections
   const [activeSection, setActiveSection] = useState('overview');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   // Student profile data
   const [profileData, setProfileData] = useState({
-    studentId: 'STU001',
-    name: 'John Doe',
-    schoolName: 'University of Technology',
-    fieldOfStudy: 'Computer Science',
-    email: 'john.doe@university.edu',
-    phone: '+1 (555) 123-4567',
-    bio: 'Passionate computer science student with a focus on AI and machine learning.',
-    skills: ['JavaScript', 'Python', 'React', 'Node.js', 'Machine Learning'],
-    graduationYear: '2025'
+    studentId: '',
+    fullName: '',
+    schoolName: '',
+    fieldOfStudy: '',
+    email: '',
+    phone: '',
+    bio: '',
+    skills: [] as string[],
+    graduationYear: ''
   });
 
   // Student projects data with pricing in XAF
@@ -59,11 +62,34 @@ export default function StudentDashboard() {
   // Discussions data
   const [discussions] = useState(studentDiscussions);
 
+  // Fetch profile on mount
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`/api/student/profile?studentId=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setProfileData(data);
+        } else {
+          console.error('Failed to fetch profile');
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, [userId]);
+
   // Fetch projects on mount
   useEffect(() => {
+    if (!userId) return;
+
     const fetchProjects = async () => {
       try {
-        const response = await fetch(`/api/projects?studentId=${profileData.studentId}`);
+        const response = await fetch(`/api/projects?studentId=${userId}`);
         if (response.ok) {
           const data = await response.json();
           setProjects(data);
@@ -79,13 +105,28 @@ export default function StudentDashboard() {
     };
 
     fetchProjects();
-  }, [profileData.studentId]);
+  }, [userId]);
 
   // Handle profile update
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsEditingProfile(false);
-    console.log('Profile updated:', profileData);
+    try {
+      const response = await fetch('/api/student/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData),
+      });
+
+      if (response.ok) {
+        setIsEditingProfile(false);
+        toast.success('Profile updated successfully');
+      } else {
+        toast.error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Error updating profile');
+    }
   };
 
   // Handle project status change
@@ -94,7 +135,7 @@ export default function StudentDashboard() {
       const response = await fetch('/api/projects', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: projectId, studentId: profileData.studentId, status: newStatus }),
+        body: JSON.stringify({ id: projectId, studentId: userId, status: newStatus }),
       });
 
       if (response.ok) {
@@ -123,7 +164,7 @@ export default function StudentDashboard() {
       const response = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...projectData, studentId: profileData.studentId }),
+        body: JSON.stringify({ ...projectData, studentId: userId }),
       });
 
       if (response.ok) {
@@ -145,7 +186,7 @@ export default function StudentDashboard() {
       const response = await fetch('/api/projects', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...projectData, studentId: profileData.studentId }),
+        body: JSON.stringify({ ...projectData, studentId: userId }),
       });
 
       if (response.ok) {
@@ -167,7 +208,7 @@ export default function StudentDashboard() {
     if (!confirm('Are you sure you want to delete this project?')) return;
 
     try {
-      const response = await fetch(`/api/projects?id=${projectId}&studentId=${profileData.studentId}`, {
+      const response = await fetch(`/api/projects?id=${projectId}&studentId=${userId}`, {
         method: 'DELETE',
       });
 

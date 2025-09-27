@@ -13,6 +13,7 @@ interface Project {
   id: number;
   _id: string; // Keep the MongoDB _id for API calls
   title: string;
+  description: string;
   student: string;
   status: string;
   category: string;
@@ -20,6 +21,8 @@ interface Project {
   fundingGoal: string;
   currentFunding: string;
   investors: number;
+  technologies: string[];
+  visibility: boolean;
 }
 
 export default function AdminDashboard() {
@@ -120,6 +123,7 @@ export default function AdminDashboard() {
           id: index + 1, // Use index as display id
           _id: project._id, // Keep MongoDB _id for API calls
           title: project.title,
+          description: project.description,
           student: project.studentId, // This should be student name, but we have studentId
           status: project.status,
           category: project.category,
@@ -127,6 +131,8 @@ export default function AdminDashboard() {
           fundingGoal: `$${project.sellingPrice}`,
           currentFunding: '$0', // This would need to be calculated from investments
           investors: project.investors,
+          technologies: project.technologies || [],
+          visibility: project.visibility !== false, // Default to true if not set
         }));
         setProjects(transformedData);
       } else {
@@ -174,26 +180,40 @@ export default function AdminDashboard() {
     }
   };
 
-  // Handle project deletion
-  const handleProjectDelete = async (projectId: number) => {
+  // Handle view project details
+  const handleViewDetails = (projectId: number) => {
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      alert(`Project Details:\n\nTitle: ${project.title}\nDescription: ${project.description}\nStudent: ${project.student}\nStatus: ${project.status}\nCategory: ${project.category}\nFunding Goal: ${project.fundingGoal}\nCurrent Funding: ${project.currentFunding}\nInvestors: ${project.investors}\nTechnologies: ${project.technologies.join(', ')}\nVisibility: ${project.visibility ? 'Visible' : 'Hidden'}\nSubmission Date: ${project.submissionDate}`);
+    }
+  };
+
+  // Handle toggle project visibility
+  const handleToggleVisibility = async (projectId: number, visibility: boolean) => {
     const project = projects.find(p => p.id === projectId);
     if (!project) return;
 
     try {
-      const response = await fetch(`/api/admin/projects?id=${project._id}`, {
-        method: 'DELETE',
+      const response = await fetch('/api/admin/projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: project._id, visibility }),
       });
       if (response.ok) {
         setProjects((prevProjects) =>
-          prevProjects.filter((p) => p.id !== projectId)
+          prevProjects.map((p) =>
+            p.id === projectId ? { ...p, visibility } : p
+          )
         );
       } else {
-        console.error('Failed to delete project');
+        console.error('Failed to update project visibility');
       }
     } catch (error) {
-      console.error('Error deleting project:', error);
+      console.error('Error updating project visibility:', error);
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -220,7 +240,8 @@ export default function AdminDashboard() {
           <ProjectsSection
             projects={projects}
             onProjectApproval={handleProjectApproval}
-            onProjectDelete={handleProjectDelete}
+            onViewDetails={handleViewDetails}
+            onToggleVisibility={handleToggleVisibility}
           />
         )}
 

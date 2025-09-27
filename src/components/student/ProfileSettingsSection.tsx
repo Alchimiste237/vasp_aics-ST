@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ProfileData {
   studentId: string;
-  name: string;
+  fullName: string;
   schoolName: string;
   fieldOfStudy: string;
   email: string;
@@ -51,9 +51,8 @@ export default function ProfileSettingsSection({
                 <input
                   type="text"
                   value={profileData.studentId}
-                  onChange={(e) => setProfileData({...profileData, studentId: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
                 />
               </div>
               <div>
@@ -62,9 +61,9 @@ export default function ProfileSettingsSection({
                 </label>
                 <input
                   type="text"
-                  value={profileData.name}
-                  onChange={(e) => setProfileData({...profileData, name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  value={profileData.fullName}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
                 />
               </div>
               <div>
@@ -74,8 +73,8 @@ export default function ProfileSettingsSection({
                 <input
                   type="text"
                   value={profileData.schoolName}
-                  onChange={(e) => setProfileData({...profileData, schoolName: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
                 />
               </div>
               <div>
@@ -85,8 +84,8 @@ export default function ProfileSettingsSection({
                 <input
                   type="text"
                   value={profileData.fieldOfStudy}
-                  onChange={(e) => setProfileData({...profileData, fieldOfStudy: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
                 />
               </div>
               <div>
@@ -163,7 +162,7 @@ export default function ProfileSettingsSection({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500">Full Name</label>
-                <p className="text-lg text-gray-900">{profileData.name}</p>
+                <p className="text-lg text-gray-900">{profileData.fullName}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500">School Name</label>
