@@ -23,6 +23,8 @@ interface ProjectCardProps {
   onViewDetails: (id: number) => void;
   onInvestment: (id: number) => void;
   onPurchase: (id: number) => void;
+  onFavoriteToggle?: (id: number) => void;
+  isFavorite?: boolean;
   showMarketInfo?: boolean;
   showPurchaseButton?: boolean;
 }
@@ -32,6 +34,8 @@ export default function ProjectCard({
   onViewDetails,
   onInvestment,
   onPurchase,
+  onFavoriteToggle,
+  isFavorite = false,
   showMarketInfo = false,
   showPurchaseButton = false
 }: ProjectCardProps) {
@@ -39,13 +43,27 @@ export default function ProjectCard({
     <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-xl font-semibold text-gray-900">{project.title}</h3>
-        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-          project.status === 'Completed' ? 'bg-green-100 text-green-800' :
-          project.status === 'Ongoing' ? 'bg-blue-100 text-blue-800' :
-          'bg-yellow-100 text-yellow-800'
-        }`}>
-          {project.status}
-        </span>
+        <div className="flex items-center space-x-2">
+          {onFavoriteToggle && (
+            <button
+              onClick={() => onFavoriteToggle(project.id)}
+              className={`p-2 rounded-full transition-colors ${
+                isFavorite ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500'
+              }`}
+            >
+              <svg className="h-5 w-5" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+          )}
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+            project.status === 'Completed' ? 'bg-green-100 text-green-800' :
+            project.status === 'Ongoing' ? 'bg-blue-100 text-blue-800' :
+            'bg-yellow-100 text-yellow-800'
+          }`}>
+            {project.status}
+          </span>
+        </div>
       </div>
 
       <p className="text-gray-600 mb-4">{project.description}</p>

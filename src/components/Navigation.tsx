@@ -8,9 +8,10 @@ import { useRouter } from 'next/navigation';
 
 interface NavigationProps {
   userType?: 'visitor' | 'student' | 'investor' | 'admin';
+  onSectionChange?: (section: string) => void;
 }
 
-export default function Navigation({ userType = 'visitor' }: NavigationProps) {
+export default function Navigation({ userType = 'visitor', onSectionChange }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { logout } = useAuth();
   const router = useRouter();
@@ -27,13 +28,23 @@ export default function Navigation({ userType = 'visitor' }: NavigationProps) {
           { name: 'Discussions', href: '/student#discussions' },
         ];
       case 'investor':
-        return [
-          { name: 'Dashboard', href: '/investor' },
-          { name: 'Discovery', href: '/investor#discovery' },
-          { name: 'Projects', href: '/investor#projects' },
-          { name: 'Invest', href: '/investor#invest' },
-          { name: 'Profile', href: '/investor#profile' },
-        ];
+        if (onSectionChange) {
+          return [
+            { name: 'Discovery', key: 'discovery' },
+            { name: 'Invest', key: 'invest' },
+            { name: 'Favorites', key: 'favorites' },
+            { name: 'Profile', key: 'profile' },
+            { name: 'Settings', key: 'settings' },
+          ];
+        } else {
+          return [
+            { name: 'Dashboard', href: '/investor' },
+            { name: 'Discovery', href: '/investor#discovery' },
+            { name: 'Projects', href: '/investor#projects' },
+            { name: 'Invest', href: '/investor#invest' },
+            { name: 'Profile', href: '/investor#profile' },
+          ];
+        }
       case 'admin':
         return [
           { name: 'Overview', href: '/admin' },
@@ -77,16 +88,28 @@ export default function Navigation({ userType = 'visitor' }: NavigationProps) {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navigationItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-gray-600 hover:text-indigo-600 transition-colors"
-              >
-                {item.name}
-              </Link>
+              'href' in item ? (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-gray-600 hover:text-indigo-600 transition-colors"
+                >
+                  {item.name}
+                </Link>
+              ) : (
+                <button
+                  key={item.name}
+                  onClick={() => onSectionChange?.(item.key)}
+                  className="text-gray-600 hover:text-indigo-600 transition-colors"
+                >
+                  {item.name}
+                </button>
+              )
             ))}
             
             {/* User Type Specific Actions */}
+            {/* Removed visitor login buttons as per request */}
+            {/*
             {userType === 'visitor' && (
               <div className="flex space-x-4">
                 <Link
@@ -109,6 +132,7 @@ export default function Navigation({ userType = 'visitor' }: NavigationProps) {
                 </Link>
               </div>
             )}
+            */}
 
             {userType !== 'visitor' && (
               <div className="flex items-center space-x-4">
@@ -146,16 +170,31 @@ export default function Navigation({ userType = 'visitor' }: NavigationProps) {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 rounded-lg mt-2">
               {navigationItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="block px-3 py-2 text-gray-600 hover:text-indigo-600 hover:bg-gray-100 rounded-md transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
+                'href' in item ? (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="block px-3 py-2 text-gray-600 hover:text-indigo-600 hover:bg-gray-100 rounded-md transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ) : (
+                  <button
+                    key={item.name}
+                    onClick={() => {
+                      onSectionChange?.(item.key);
+                      setIsMenuOpen(false);
+                    }}
+                    className="block px-3 py-2 text-gray-600 hover:text-indigo-600 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    {item.name}
+                  </button>
+                )
               ))}
               
+              {/* Removed visitor login buttons in mobile menu as per request */}
+              {/*
               {userType === 'visitor' && (
                 <div className="pt-4 border-t border-gray-200">
                   <Link
@@ -181,6 +220,7 @@ export default function Navigation({ userType = 'visitor' }: NavigationProps) {
                   </Link>
                 </div>
               )}
+              */}
 
               {userType !== 'visitor' && (
                 <div className="pt-4 border-t border-gray-200">

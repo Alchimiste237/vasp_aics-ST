@@ -87,6 +87,17 @@ export default function OverviewSection({ stats, recentActivities }: OverviewSec
       {/* Recent Activities */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activities</h3>
+      {recentActivities.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <div className="text-gray-400 mb-4">
+            <svg className="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Recent Activities</h3>
+          <p className="text-gray-500">There are no recent activities to display at this time.</p>
+        </div>
+      ) : (
         <div className="space-y-4">
           {recentActivities.map((activity) => (
             <div key={activity.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -100,6 +111,7 @@ export default function OverviewSection({ stats, recentActivities }: OverviewSec
             </div>
           ))}
         </div>
+      )}
       </div>
     </div>
   );

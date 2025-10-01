@@ -1,19 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navigation from '../../components/Navigation';
-import InvestorNavigationTabs from '../../components/investor/InvestorNavigationTabs';
 import SearchBar from '../../components/shared/SearchBar';
 import CategoryFilter from '../../components/shared/CategoryFilter';
 import ProjectGrid from '../../components/shared/ProjectGrid';
 import ProfileSection from '../../components/investor/ProfileSection';
 import InvestorSettingsSection from '../../components/investor/InvestorSettingsSection';
 
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  student: string;
+  school: string;
+  category: string;
+  status: string;
+  fundingGoal: string;
+  currentFunding: string;
+  sellingPrice: string;
+  investors: number;
+  technologies: string[];
+  timeline: string;
+  marketSize: string;
+  competitiveAdvantage: string;
+}
+
 export default function InvestorDashboard() {
   // State management for different sections
   const [activeSection, setActiveSection] = useState('discovery');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  // Projects data
+  const [projects, setProjects] = useState([]);
+
+  // Favorites
+  const [favorites, setFavorites] = useState<number[]>([]);
 
   // Investor profile data
   const [profileData] = useState({
@@ -30,80 +53,33 @@ export default function InvestorDashboard() {
     website: 'techventures.com'
   });
 
-  // Projects data for discovery and investment with XAF pricing
-  const [projects] = useState([
-    {
-      id: 1,
-      title: 'AI-Powered Learning Assistant',
-      description: 'An intelligent tutoring system that adapts to individual learning styles',
-      student: 'John Doe',
-      school: 'University of Technology',
-      category: 'Education Technology',
-      status: 'Completed',
-      fundingGoal: '45,000,000 XAF',
-      currentFunding: '27,000,000 XAF',
-      sellingPrice: '2,500,000 XAF',
-      investors: 3,
-      technologies: ['Python', 'TensorFlow', 'React', 'Node.js'],
-      timeline: '6 months',
-      marketSize: '1,500,000,000,000 XAF',
-      competitiveAdvantage: 'Advanced AI algorithms with 95% accuracy rate'
-    },
-    {
-      id: 2,
-      title: 'Sustainable Energy Tracker',
-      description: 'IoT device for monitoring and optimizing home energy consumption',
-      student: 'Sarah Johnson',
-      school: 'Green Tech University',
-      category: 'Green Technology',
-      status: 'Ongoing',
-      fundingGoal: '30,000,000 XAF',
-      currentFunding: '12,000,000 XAF',
-      sellingPrice: '1,800,000 XAF',
-      investors: 1,
-      technologies: ['Arduino', 'C++', 'IoT', 'Data Analytics'],
-      timeline: '4 months',
-      marketSize: '1,080,000,000,000 XAF',
-      competitiveAdvantage: 'Real-time energy optimization with 30% savings'
-    },
-    {
-      id: 3,
-      title: 'Blockchain Voting System',
-      description: 'Secure and transparent voting platform using blockchain technology',
-      student: 'Mike Chen',
-      school: 'Crypto University',
-      category: 'Blockchain',
-      status: 'Starting',
-      fundingGoal: '60,000,000 XAF',
-      currentFunding: '0 XAF',
-      sellingPrice: '3,200,000 XAF',
-      investors: 0,
-      technologies: ['Solidity', 'Web3.js', 'React', 'Ethereum'],
-      timeline: '8 months',
-      marketSize: '300,000,000,000 XAF',
-      competitiveAdvantage: 'First fully decentralized voting solution'
-    },
-    {
-      id: 4,
-      title: 'VR Medical Training Platform',
-      description: 'Virtual reality platform for medical students to practice surgeries',
-      student: 'Dr. Emily Wilson',
-      school: 'Medical University',
-      category: 'Healthcare Technology',
-      status: 'Ongoing',
-      fundingGoal: '90,000,000 XAF',
-      currentFunding: '45,000,000 XAF',
-      sellingPrice: '4,500,000 XAF',
-      investors: 2,
-      technologies: ['Unity', 'C#', 'VR', 'Machine Learning'],
-      timeline: '12 months',
-      marketSize: '1,920,000,000,000 XAF',
-      competitiveAdvantage: 'Haptic feedback technology for realistic training'
-    }
-  ]);
+  // Fetch projects and favorites on mount
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch('/api/projects');
+        if (response.ok) {
+          const data = await response.json();
+          setProjects(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch projects:', error);
+      }
+    };
+
+    const loadFavorites = () => {
+      const stored = localStorage.getItem('investorFavorites');
+      if (stored) {
+        setFavorites(JSON.parse(stored));
+      }
+    };
+
+    fetchProjects();
+    loadFavorites();
+  }, []);
 
   // Filter projects based on search and category
-  const filteredProjects = projects.filter(project => {
+  const filteredProjects = (projects as Project[]).filter(project => {
     const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          project.student.toLowerCase().includes(searchQuery.toLowerCase());
@@ -129,16 +105,25 @@ export default function InvestorDashboard() {
     // Add project details logic here
   };
 
+  // Handle favorite toggle
+  const handleFavoriteToggle = (projectId: number) => {
+    const newFavorites = favorites.includes(projectId)
+      ? favorites.filter(id => id !== projectId)
+      : [...favorites, projectId];
+    setFavorites(newFavorites);
+    localStorage.setItem('investorFavorites', JSON.stringify(newFavorites));
+  };
+
+  // Get favorite projects
+  const favoriteProjects = (projects as Project[]).filter(project => favorites.includes(project.id));
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <Navigation userType="investor" />
+      <Navigation userType="investor" onSectionChange={setActiveSection} />
 
       {/* Search Bar */}
       <SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-
-      {/* Section Navigation */}
-      <InvestorNavigationTabs activeSection={activeSection} onSectionChange={setActiveSection} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -154,6 +139,8 @@ export default function InvestorDashboard() {
               onViewDetails={handleViewDetails}
               onInvestment={handleInvestment}
               onPurchase={handlePurchase}
+              onFavoriteToggle={handleFavoriteToggle}
+              favorites={favorites}
               showMarketInfo={false}
               showPurchaseButton={true}
             />
@@ -165,10 +152,12 @@ export default function InvestorDashboard() {
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">All Projects</h2>
             <ProjectGrid
-              projects={projects}
+              projects={projects as Project[]}
               onViewDetails={handleViewDetails}
               onInvestment={handleInvestment}
               onPurchase={handlePurchase}
+              onFavoriteToggle={handleFavoriteToggle}
+              favorites={favorites}
               showMarketInfo={false}
               showPurchaseButton={false}
             />
@@ -190,16 +179,45 @@ export default function InvestorDashboard() {
           </div>
         )}
 
-        {/* Profile Section */}
-        {activeSection === 'profile' && (
-          <ProfileSection profile={profileData} />
-        )}
+      {/* Profile Section */}
+      {activeSection === 'profile' && (
+        <ProfileSection profile={profileData} />
+      )}
 
-        {/* Settings Section */}
-        {activeSection === 'settings' && (
-          <InvestorSettingsSection />
-        )}
-      </div>
+      {/* Favorites Section */}
+      {activeSection === 'favorites' && (
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">Favorite Projects</h2>
+          {favoriteProjects.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-md p-8 text-center">
+              <div className="text-gray-400 mb-4">
+                <svg className="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Favorite Projects</h3>
+              <p className="text-gray-500">You haven't added any projects to your favorites yet. Browse projects and click the heart icon to add them here.</p>
+            </div>
+          ) : (
+            <ProjectGrid
+              projects={favoriteProjects}
+              onViewDetails={handleViewDetails}
+              onInvestment={handleInvestment}
+              onPurchase={handlePurchase}
+              onFavoriteToggle={handleFavoriteToggle}
+              favorites={favorites}
+              showMarketInfo={true}
+              showPurchaseButton={true}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Settings Section */}
+      {activeSection === 'settings' && (
+        <InvestorSettingsSection />
+      )}
     </div>
+  </div>
   );
 }

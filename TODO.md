@@ -1,4 +1,14 @@
-- [x] Update ProjectsSection.tsx: Remove Delete button, add onViewDetails prop, implement view button click
-- [x] Update admin/page.tsx: Remove onProjectDelete, add onViewDetails, remove handleProjectDelete
-- [x] Update /api/admin/projects/route.ts: Remove DELETE method
-- [x] Update /api/projects/route.ts: Modify GET to filter by status if no studentId (for public view)
+- [x] Remove desktop login buttons for visitors in Navigation.tsx
+- [x] Remove mobile login buttons for visitors in Navigation.tsx
+- [x] Add SearchBar component to admin dashboard page
+- [x] Position AdminNavigationTabs below the SearchBar
+- [x] Add searchQuery state to admin page
+- [x] Pass searchQuery to SearchBar component
+- [x] Modify Navigation component to support onSectionChange for investor
+- [x] Remove InvestorNavigationTabs from investor page
+- [x] Pass onSectionChange to Navigation in investor page
+- [x] Remove Projects link from investor navigation
+- [ ] Fetch projects data from database in investor dashboard
+- [ ] Add favorites functionality with local storage
+- [ ] Add Favorites section to investor dashboard
+- [ ] Add Favorites link to investor navigation

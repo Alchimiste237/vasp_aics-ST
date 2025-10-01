@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Navigation from '../../components/Navigation';
+import SearchBar from '../../components/shared/SearchBar';
 import AdminNavigationTabs from '../../components/admin/AdminNavigationTabs';
 import OverviewSection from '../../components/admin/OverviewSection';
 import UsersSection from '../../components/admin/UsersSection';
@@ -28,6 +29,9 @@ interface Project {
 export default function AdminDashboard() {
   // State management for different sections
   const [activeSection, setActiveSection] = useState('overview');
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
 
   // System statistics
   const [stats] = useState({
@@ -219,6 +223,9 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <Navigation userType="admin" />
+
+      {/* Search Bar */}
+      <SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       {/* Section Navigation */}
       <AdminNavigationTabs activeSection={activeSection} onSectionChange={setActiveSection} />
